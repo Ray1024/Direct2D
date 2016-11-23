@@ -35,6 +35,7 @@
 #pragma comment(lib, "D2D1.lib")
 #pragma comment(lib, "DWrite.lib")
 
+
 /******************************************************************
 需要用到的宏定义
 ******************************************************************/
@@ -111,8 +112,9 @@ private:
 	IDWriteFactory*			m_pDWriteFactory;	// DWrite工厂
 	ID2D1HwndRenderTarget*	m_pRT;				// 呈现器
 
-	ID2D1SolidColorBrush *	m_pBrush;			// 文字画刷
-	IDWriteTextFormat*		m_pTextFormat;		// 格式1
+	ID2D1SolidColorBrush *	m_pBrush;			// 画刷
+	ID2D1RectangleGeometry*	m_pRectangle;		// 矩形
+	D2D1_RECT_F				m_rect;				// 矩形的数据存储
 };
 
 

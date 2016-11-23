@@ -1,4 +1,4 @@
-#include "D2D_TMPL.h"
+#include "D2DGeometricTranslationOrder.h"
 
 /******************************************************************
 WinMain
@@ -40,7 +40,7 @@ DemoApp::DemoApp() :
 	m_pDWriteFactory(NULL),
     m_pRT(NULL),
     m_pBrush(NULL),
-	m_pTextFormat(NULL)
+	m_pRectangle(NULL)
 {
 }
 
@@ -50,7 +50,7 @@ DemoApp::~DemoApp()
 	SafeRelease(&m_pDWriteFactory);
     SafeRelease(&m_pRT);
     SafeRelease(&m_pBrush);
-	SafeRelease(&m_pTextFormat);
+	SafeRelease(&m_pRectangle);
 }
 
 HRESULT DemoApp::Initialize()
@@ -83,7 +83,7 @@ HRESULT DemoApp::Initialize()
 
         m_hwnd = CreateWindow(
             L"D2DDemoApp",
-            L"D2D_TMPL",
+            L"D2DGeometricTranslationOrder",
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
@@ -137,7 +137,7 @@ HRESULT DemoApp::CreateDeviceResources()
             rc.bottom - rc.top
             );
 
-        // 创建render target
+        // Create a Direct2D render target
         hr = m_pD2DFactory->CreateHwndRenderTarget(
             D2D1::RenderTargetProperties(),
             D2D1::HwndRenderTargetProperties(m_hwnd, size),
@@ -153,18 +153,13 @@ HRESULT DemoApp::CreateDeviceResources()
                 );
         }
 
-		// 创建字体格式
+		// 创建矩形
 		if (SUCCEEDED(hr))
 		{
-			hr = m_pDWriteFactory->CreateTextFormat( 
-				L"Arial Black", 
-				NULL, 
-				DWRITE_FONT_WEIGHT_NORMAL, 
-				DWRITE_FONT_STYLE_NORMAL, 
-				DWRITE_FONT_STRETCH_NORMAL, 
-				20.0, 
-				L"en-us",
-				&m_pTextFormat);
+			m_rect = D2D1::RectF(0,0,100,100);
+			hr = m_pD2DFactory->CreateRectangleGeometry(
+				m_rect,
+				&m_pRectangle);
 		}
     }
 
@@ -175,7 +170,6 @@ void DemoApp::DiscardDeviceResources()
 {
     SafeRelease(&m_pRT);
     SafeRelease(&m_pBrush);
-	SafeRelease(&m_pTextFormat);
 }
 
 void DemoApp::RunMessageLoop()
@@ -192,6 +186,8 @@ void DemoApp::RunMessageLoop()
 HRESULT DemoApp::OnRender()
 {
     HRESULT hr;
+	ID2D1TransformedGeometry* transGeometry = NULL;
+	D2D1::Matrix3x2F transMatrix;
 
     hr = CreateDeviceResources();
     if (SUCCEEDED(hr) && !(m_pRT->CheckWindowState() & D2D1_WINDOW_STATE_OCCLUDED))
@@ -199,19 +195,35 @@ HRESULT DemoApp::OnRender()
         // 开始绘制
         m_pRT->BeginDraw();
 
+		D2D1::Matrix3x2F scale = D2D1::Matrix3x2F::Scale(
+			1.5,1.5, 
+			D2D1::Point2F((m_rect.right+m_rect.left)/2,(m_rect.bottom+m_rect.top)/2));
+		D2D1::Matrix3x2F rotate = D2D1::Matrix3x2F::Rotation(
+			45,
+			D2D1::Point2F((m_rect.right+m_rect.left)/2,(m_rect.bottom+m_rect.top)/2));
+		D2D1::Matrix3x2F translate = D2D1::Matrix3x2F::Translation(200,200);
+
+		// 使用矩阵创建变换的几何图形
+		transMatrix = scale * rotate * translate;
+		m_pD2DFactory->CreateTransformedGeometry(
+			m_pRectangle,
+			transMatrix,
+			&transGeometry);
+
         m_pRT->SetTransform(D2D1::Matrix3x2F::Identity());
         m_pRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		// 绘制
-        m_pRT->DrawText(
-			L"Ray1024_D2D_Template",
-			wcslen(L"Ray1024_D2D_Template"),
-			m_pTextFormat,
-			D2D1::RectF(0,0,300,0),
-			m_pBrush);
+		// 绘制矩形
+		m_pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Red));
+		m_pRT->DrawGeometry(m_pRectangle, m_pBrush);
 		
+		m_pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Green));
+		m_pRT->DrawGeometry(transGeometry, m_pBrush);
+
         // 结束绘制
         hr = m_pRT->EndDraw();
+
+		SafeRelease(&transGeometry);
 
         if (hr == D2DERR_RECREATE_TARGET)
         {
