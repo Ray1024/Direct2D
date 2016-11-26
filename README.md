@@ -10,6 +10,10 @@ This project is a test about rendering waveform using bezier in Direct2D.
 This project is about collision detection between two geometrys.</br>
 Article Link : http://www.cnblogs.com/Ray1024/p/6030242.html
 
+### D2DCreateBitmapFromResource
+This project shows how to create bitmap from resource file in Direct2D.</br>
+Article Link : http://www.cnblogs.com/Ray1024/p/6104368.html
+
 ### D2DFPS
 This project is a test about fps in Direct2D.
 
