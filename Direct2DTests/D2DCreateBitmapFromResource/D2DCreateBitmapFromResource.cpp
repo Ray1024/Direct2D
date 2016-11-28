@@ -31,7 +31,7 @@ HRESULT LoadResourceBitmap(
 	DWORD imageFileSize = 0;
 
 	// Locate the resource.
-	imageResHandle = FindResourceW(HINST_THISCOMPONENT, MAKEINTRESOURCE(IDB_PNG1), L"PNG");
+	imageResHandle = FindResourceW(HINST_THISCOMPONENT, resourceName, resourceType);
 	HRESULT hr = imageResHandle ? S_OK : E_FAIL;
 	if (SUCCEEDED(hr))
 	{
@@ -325,7 +325,9 @@ HRESULT DemoApp::OnRender()
 		// »æÖÆ
         m_pRT->DrawBitmap(
 			m_pBitmap,
-			D2D1::RectF(0,0,300,300));
+			D2D1::RectF(0,0,
+			m_pBitmap->GetSize().width,
+			m_pBitmap->GetSize().height));
 		
         // ½áÊø»æÖÆ
         hr = m_pRT->EndDraw();
