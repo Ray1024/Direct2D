@@ -17,6 +17,10 @@ Article Link : http://www.cnblogs.com/Ray1024/p/6104368.html
 ### D2DFPS
 This project is a test about fps in Direct2D.
 
+### D2DFrameApp
+This project is a frame application of my tests in Direct2D.</br>
+It can display the fps , so you can use the project to develop games or animations.
+
 ### D2DGeometricTranslationOrder
 This project shows that the different order of geometric translation lead to different result.</br>
 The right order is 'scale -> rotate -> translate'in the geometric translation.
