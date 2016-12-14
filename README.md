@@ -1,4 +1,4 @@
-# Ray1024_D2D_Codes
+# Direct2DTests
 My Direct2D Codes
 
 ## 1.Direct2DTests
