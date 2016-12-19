@@ -1,25 +1,13 @@
 //-----------------------------------------------------------------
-// 功能：对图片作颜色混合，更多详细解释请参考：http://www.cnblogs.com/Ray1024/
+// 功能：纹理混合之单色混合，更多详细解释请参考：http://www.cnblogs.com/Ray1024/
 // 作者：Ray1024
 // 网址：http://www.cnblogs.com/Ray1024/
 //-----------------------------------------------------------------
 
 #include "D2DBitmapBlend.h"
 
-HRESULT LoadBitmapFromFile(ID2D1RenderTarget *pRenderTarget,IWICImagingFactory *pIWICFactory,
-	LPCWSTR uri,UINT width,UINT height,ID2D1Bitmap **ppBitmap);
-IWICBitmap* GetWICBitmapFromFile(IWICImagingFactory *pIWICFactory,LPCWSTR uri,BYTE** srcData,
-	UINT* srcSize);
-ID2D1Bitmap* GetD2DBitmapFromWICBitmap(IWICImagingFactory *pIWICFactory,ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source,float d2dWidth,float d2dHeight,BYTE* srcData,UINT srcSize);
-ID2D1Bitmap* GetBitmapFromFile(IWICImagingFactory *pIWICFactory,ID2D1RenderTarget *pRenderTarget,
-	LPCWSTR uri,UINT width,UINT height);
-ID2D1Bitmap* MixedColorFromWICBitmap(IWICImagingFactory *pIWICFactory,ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source,const D2D1_COLOR_F &color,float d2dWidth,float d2dHeight,BYTE* srcData,UINT srcSize);
-HRESULT DoBitmapMixedColor(IWICBitmap* source, const D2D1_COLOR_F &color, BYTE* srcData, UINT srcSize);
-
 //-----------------------------------------------------------------
-// 从资源文件加载D2D位图
+// 从文件加载D2D位图
 //-----------------------------------------------------------------
 HRESULT LoadBitmapFromFile(
 	ID2D1RenderTarget *pRenderTarget,
@@ -127,19 +115,26 @@ HRESULT LoadBitmapFromFile(
 	return hr;
 }
 
-IWICBitmap* GetWICBitmapFromFile(
+//-----------------------------------------------------------------
+// 从文件加载WIC位图，进行纹理混合，最终创建出D2D位图
+//-----------------------------------------------------------------
+ID2D1Bitmap* GetBlendedBitmapFromFile(
 	IWICImagingFactory *pIWICFactory,
+	ID2D1RenderTarget *pRenderTarget,
 	LPCWSTR uri,
-	BYTE** srcData,
-	UINT* srcSize)
+	const D2D1_COLOR_F &color)
 {
+	ID2D1Bitmap*			pBitmap		= NULL;
 	IWICBitmapDecoder*		pDecoder	= NULL;
 	IWICBitmapFrameDecode*	pSource		= NULL;
 	IWICBitmap*				pWIC		= NULL;
-	UINT					originalWidth = 0;
-	UINT					originalHeight = 0;
+	IWICFormatConverter*	pConverter	= NULL;
+	IWICBitmapScaler*		pScaler		= NULL;
+	UINT					originalWidth	= 0;
+	UINT					originalHeight	= 0;
 
-	// 加载位图-------------------------------------------------
+	// 1.加载IWICBitmap对象
+
 	HRESULT hr = pIWICFactory->CreateDecoderFromFilename(
 		uri,
 		NULL,
@@ -166,61 +161,40 @@ IWICBitmap* GetWICBitmapFromFile(
 
 	if (SUCCEEDED(hr))
 	{
-		UINT uiWidth = 0;
-		UINT uiHeight = 0;
-		pWIC->GetSize(&uiWidth, &uiHeight);
-
+		// 2.从IWICBitmap对象读取像素数据
 		IWICBitmapLock *pILock = NULL;
-		WICRect rcLock = { 0, 0, uiWidth, uiHeight };
+		WICRect rcLock = { 0, 0, originalWidth, originalHeight };
 		hr = pWIC->Lock(&rcLock, WICBitmapLockWrite, &pILock);
 
 		if (SUCCEEDED(hr))
 		{
 			UINT cbBufferSize = 0;
-			UINT cbStride = 0;
 			BYTE *pv = NULL;
-
-			// Retrieve the stride.
-			hr = pILock->GetStride(&cbStride);
 
 			if (SUCCEEDED(hr))
 			{
+				// 获取锁定矩形中左上角像素的指针
 				hr = pILock->GetDataPointer(&cbBufferSize, &pv);
 			}
 
-			if (SUCCEEDED(hr))
+			// 3.进行纹理混合的像素计算
+			for (unsigned int i=0; i<cbBufferSize; i+=4)
 			{
-				*srcData = new BYTE[cbBufferSize];
-				memcpy(*srcData, pv, cbBufferSize);
-				*srcSize = cbBufferSize;
+				if (pv[i+3] != 0)
+				{
+					pv[i]	*=color.b;
+					pv[i+1]	*=color.g;
+					pv[i+2]	*=color.r;
+					pv[i+3] *=color.a;
+				}
 			}
 
-			// Release the bitmap lock.
+			// 4.颜色混合操作结束，释放IWICBitmapLock对象
 			pILock->Release();
 		}
 	}
 
-	SafeRelease(&pDecoder);
-	SafeRelease(&pSource);
-
-	return pWIC;
-}
-
-ID2D1Bitmap* GetD2DBitmapFromWICBitmap(
-	IWICImagingFactory *pIWICFactory,
-	ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source, 
-	float d2dWidth, 
-	float d2dHeight,
-	BYTE* srcData,
-	UINT srcSize)
-{
-	IWICFormatConverter*	pConverter	= NULL;
-	IWICBitmapScaler*		pScaler		= NULL;
-	ID2D1Bitmap*			bitmap		= NULL;
-	HRESULT					hr			= S_FALSE;
-
-	Assert(source);	// source can't be null
+	// 5.使用IWICBitmap对象创建D2D位图
 
 	if (SUCCEEDED(hr))
 	{
@@ -232,7 +206,7 @@ ID2D1Bitmap* GetD2DBitmapFromWICBitmap(
 	}
 	if (SUCCEEDED(hr))
 	{
-		hr = pScaler->Initialize(source, (UINT)d2dWidth, (UINT)d2dHeight, WICBitmapInterpolationModeCubic);
+		hr = pScaler->Initialize(pWIC, (UINT)originalWidth, (UINT)originalHeight, WICBitmapInterpolationModeCubic);
 	}
 	if (SUCCEEDED(hr))
 	{
@@ -248,120 +222,19 @@ ID2D1Bitmap* GetD2DBitmapFromWICBitmap(
 
 	if (SUCCEEDED(hr))
 	{
-		// Create a Direct2D bitmap from the WIC bitmap.
 		hr = pRenderTarget->CreateBitmapFromWicBitmap(
 			pConverter,
 			NULL,
-			&bitmap
+			&pBitmap
 			);
 	}
 
 	SafeRelease(&pConverter);
 	SafeRelease(&pScaler);
+	SafeRelease(&pDecoder);
+	SafeRelease(&pSource);
 
-	if (SUCCEEDED(hr))
-	{
-		return bitmap;
-	}
-
-	return NULL;
-}
-
-ID2D1Bitmap* GetBitmapFromFile(
-	IWICImagingFactory *pIWICFactory, 
-	ID2D1RenderTarget *pRenderTarget,
-	LPCWSTR uri, 
-	UINT width, 
-	UINT height)
-{
-	BYTE*			srcData = NULL;
-	UINT			srcSize = 0;
-	IWICBitmap*		wicBitmap = NULL;
-	ID2D1Bitmap*	bitmap = NULL;
-
-	wicBitmap = GetWICBitmapFromFile(pIWICFactory, uri, &srcData, &srcSize);
-	delete[] srcData;
-	if (wicBitmap)
-	{
-		bitmap = GetD2DBitmapFromWICBitmap(pIWICFactory, pRenderTarget, wicBitmap, (float)width, (float)height, NULL, srcSize);
-	}
-
-	return bitmap;
-}
-
-ID2D1Bitmap* MixedColorFromWICBitmap(
-	IWICImagingFactory *pIWICFactory, 
-	ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source,
-	const D2D1_COLOR_F &color,
-	float d2dWidth,
-	float d2dHeight,
-	BYTE* srcData,
-	UINT srcSize)
-{
-	ID2D1Bitmap*	bitmap = NULL;
-
-	HRESULT hr = DoBitmapMixedColor(source, color, srcData, srcSize);
-	if (SUCCEEDED(hr))
-	{
-		bitmap = GetD2DBitmapFromWICBitmap(pIWICFactory, pRenderTarget, source, d2dWidth, d2dHeight, srcData, srcSize);
-	}
-
-	return bitmap;
-}
-
-HRESULT DoBitmapMixedColor(
-	IWICBitmap* source, 
-	const D2D1_COLOR_F &color,
-	BYTE* srcData,
-	UINT srcSize)
-{
-	Assert(source);	// source can't be null
-
-	UINT uiWidth = 0;
-	UINT uiHeight = 0;
-	source->GetSize(&uiWidth, &uiHeight);
-
-	IWICBitmapLock *pILock = NULL;
-	WICRect rcLock = { 0, 0, uiWidth, uiHeight };
-	HRESULT hr = source->Lock(&rcLock, WICBitmapLockWrite, &pILock);
-
-	if (SUCCEEDED(hr))
-	{
-		UINT cbBufferSize = 0;
-		UINT cbStride = 0;
-		BYTE *pv = NULL;
-
-		// Retrieve the stride.
-		hr = pILock->GetStride(&cbStride);
-
-		if (SUCCEEDED(hr))
-		{
-			hr = pILock->GetDataPointer(&cbBufferSize, &pv);
-		}
-
-		// reset the texture
-		if (cbBufferSize==srcSize)
-		{
-			memcpy(pv, srcData, srcSize);
-		}
-
-		for (unsigned int i=0; i<cbBufferSize; i+=4)
-		{
-			if (pv[i+3] != 0)
-			{
-				pv[i]	*=color.b;
-				pv[i+1]	*=color.g;
-				pv[i+2]	*=color.r;
-				pv[i+3] *=color.a;
-			}
-		}
-
-		// Release the bitmap lock.
-		pILock->Release();
-	}
-
-	return hr;
+	return pBitmap;
 }
 
 /******************************************************************
@@ -535,22 +408,10 @@ HRESULT DemoApp::CreateDeviceResources()
 		// 创建位图，并进行颜色混合
 		if (SUCCEEDED(hr))
 		{
-			IWICBitmap*			pWIC = NULL;
-			BYTE*				srcData = NULL;
-			UINT				srcSize = 0;
-
-			pWIC = GetWICBitmapFromFile(m_pWICFactory,L"bitmap.png", &srcData, &srcSize);
-
-			UINT bitmapWidth, bitmapHeight;
-			pWIC->GetSize(&bitmapWidth, &bitmapHeight);
-			m_pBitmapBlended = MixedColorFromWICBitmap(m_pWICFactory, m_pRT, pWIC,
-				D2D1::ColorF(0.5, 0, 0, 1),	bitmapWidth, bitmapHeight, srcData, srcSize);
-
-			m_pBitmapBlended1 = MixedColorFromWICBitmap(m_pWICFactory, m_pRT, pWIC,
-				D2D1::ColorF(0, 0.5, 0, 1),	bitmapWidth, bitmapHeight, srcData, srcSize);
-
-			m_pBitmapBlended2 = MixedColorFromWICBitmap(m_pWICFactory, m_pRT, pWIC,
-				D2D1::ColorF(0, 0, 0.5, 1),	bitmapWidth, bitmapHeight, srcData, srcSize);
+			// 从文件创建WIC位图，将WIC位图进行颜色混合，之后创建D2D位图
+			m_pBitmapBlended = GetBlendedBitmapFromFile(m_pWICFactory, m_pRT, L"bitmap.png", D2D1::ColorF(1, 0, 0, 1));//红色
+			m_pBitmapBlended1 = GetBlendedBitmapFromFile(m_pWICFactory, m_pRT, L"bitmap.png", D2D1::ColorF(0, 1, 0, 1));//绿色
+			m_pBitmapBlended2 = GetBlendedBitmapFromFile(m_pWICFactory, m_pRT, L"bitmap.png", D2D1::ColorF(0, 0, 1, 1));//蓝色
 		}
     }
 

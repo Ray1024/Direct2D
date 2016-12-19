@@ -182,12 +182,15 @@ IWICBitmap* GetWICBitmapFromFile(
 
 			// Retrieve the stride.
 			hr = pILock->GetStride(&cbStride);
-
+			WICPixelFormatGUID format;
+			pILock->GetPixelFormat(&format);
 			if (SUCCEEDED(hr))
 			{
 				hr = pILock->GetDataPointer(&cbBufferSize, &pv);
 			}
 
+			// 伴随IWICBitmap对象返回，保存图像像素数据，
+			// 因为我们将重复利用IWICBitmap对象，所以要保存图片原始像素数据
 			if (SUCCEEDED(hr))
 			{
 				*srcData = new BYTE[cbBufferSize];
