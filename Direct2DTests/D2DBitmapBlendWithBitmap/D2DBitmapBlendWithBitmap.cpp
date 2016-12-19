@@ -370,7 +370,8 @@ HRESULT BlendWithBitmap(
 	UINT srcSize,
 	IWICBitmap* source1, 
 	BYTE* srcData1,
-	UINT srcSize1)
+	UINT srcSize1,
+	float proportion)
 {
 	Assert(source!=NULL && source1!=NULL);	// source can't be null
 
@@ -451,14 +452,10 @@ HRESULT BlendWithBitmap(
 		{
 			if (pv[i+3] != 0)
 			{
-// 				pv[i]	*= pv1[i];
-// 				pv[i+1]	*= pv1[i+1];
-// 				pv[i+2]	*= pv1[i+2];
-// 				pv[i+3] *= pv1[i+3];
-				pv[i]	= pv[i]*0.5	  + pv1[i]*0.5;
-				pv[i+1]	= pv[i+1]*0.5 + pv1[i+1]*0.5;
-				pv[i+2]	= pv[i+2]*0.5 + pv1[i+2]*0.5;
-				pv[i+3] = pv[i+3]*0.5 + pv1[i+3]*0.5;				
+				pv[i]	= pv[i]*(1-proportion)	 + pv1[i]*proportion;
+				pv[i+1]	= pv[i+1]*(1-proportion) + pv1[i+1]*proportion;
+				pv[i+2]	= pv[i+2]*(1-proportion) + pv1[i+2]*proportion;
+				pv[i+3] = pv[i+3]*(1-proportion) + pv1[i+3]*proportion;				
 			}
 		}
 
@@ -483,7 +480,7 @@ ID2D1Bitmap* GetBlendedBitmapWithBitmap(
 {
 	ID2D1Bitmap*	bitmap = NULL;
 
-	HRESULT hr = BlendWithBitmap(source, srcData, srcSize, source1, srcData1, srcSize1);
+	HRESULT hr = BlendWithBitmap(source, srcData, srcSize, source1, srcData1, srcSize1, 0.7);
 	if (SUCCEEDED(hr))
 	{
 		bitmap = GetD2DBitmapFromWICBitmap(pIWICFactory, pRenderTarget, source, d2dWidth, d2dHeight, srcData, srcSize);
