@@ -1,25 +1,13 @@
 //-----------------------------------------------------------------
-// 功能：把两个图片混合再绘制，更多详细解释请参考：http://www.cnblogs.com/Ray1024/
+// 功能：纹理混合（两个纹理），更多详细解释请参考：http://www.cnblogs.com/Ray1024/
 // 作者：Ray1024
 // 网址：http://www.cnblogs.com/Ray1024/
 //-----------------------------------------------------------------
 
 #include "D2DBitmapBlendWithBitmap.h"
 
-HRESULT LoadBitmapFromFile(ID2D1RenderTarget *pRenderTarget,IWICImagingFactory *pIWICFactory,
-	LPCWSTR uri,UINT width,UINT height,ID2D1Bitmap **ppBitmap);
-IWICBitmap* GetWICBitmapFromFile(IWICImagingFactory *pIWICFactory,LPCWSTR uri,BYTE** srcData,
-	UINT* srcSize);
-ID2D1Bitmap* GetD2DBitmapFromWICBitmap(IWICImagingFactory *pIWICFactory,ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source,float d2dWidth,float d2dHeight,BYTE* srcData,UINT srcSize);
-ID2D1Bitmap* GetBitmapFromFile(IWICImagingFactory *pIWICFactory,ID2D1RenderTarget *pRenderTarget,
-	LPCWSTR uri,UINT width,UINT height);
-ID2D1Bitmap* GetBlendedBitmapWithColor(IWICImagingFactory *pIWICFactory,ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source,const D2D1_COLOR_F &color,float d2dWidth,float d2dHeight,BYTE* srcData,UINT srcSize);
-HRESULT BlendWithColor(IWICBitmap* source, const D2D1_COLOR_F &color, BYTE* srcData, UINT srcSize);
-
 //-----------------------------------------------------------------
-// 从资源文件加载D2D位图
+// 从文件加载D2D位图
 //-----------------------------------------------------------------
 HRESULT LoadBitmapFromFile(
 	ID2D1RenderTarget *pRenderTarget,
@@ -35,7 +23,6 @@ HRESULT LoadBitmapFromFile(
 	IWICFormatConverter *pConverter = NULL;
 	IWICBitmapScaler *pScaler = NULL;
 
-	// 加载位图-------------------------------------------------
 	HRESULT hr = pIWICFactory->CreateDecoderFromFilename(
 		uri,
 		NULL,
@@ -127,20 +114,74 @@ HRESULT LoadBitmapFromFile(
 	return hr;
 }
 
-IWICBitmap* GetWICBitmapFromFile(
+//-----------------------------------------------------------------
+// 从文件加载并混合两个纹理
+// 注意：这里我们只用了两个分辨率一样的图片进行混合，
+//		 如果你使用的两个图片分辨率不一样，请修改这个函数里面两个纹理的创建尺寸。
+//-----------------------------------------------------------------
+ID2D1Bitmap* GetBitmapBlendWithBitmapFromFile(
 	IWICImagingFactory *pIWICFactory,
-	LPCWSTR uri,
-	BYTE** srcData,
-	UINT* srcSize)
+	ID2D1RenderTarget *pRenderTarget,
+	LPCWSTR uri,		// 主纹理
+	LPCWSTR uriBlend,	// 叠加纹理
+	float proportion)
 {
+	ID2D1Bitmap*			pBitmap		= NULL;
 	IWICBitmapDecoder*		pDecoder	= NULL;
 	IWICBitmapFrameDecode*	pSource		= NULL;
+	IWICBitmapDecoder*		pDecoder1	= NULL;
+	IWICBitmapFrameDecode*	pSource1	= NULL;
 	IWICBitmap*				pWIC		= NULL;
-	UINT					originalWidth = 0;
-	UINT					originalHeight = 0;
+	IWICFormatConverter*	pConverter	= NULL;
+	IWICBitmapScaler*		pScaler		= NULL;
+	UINT					originalWidth	= 0;
+	UINT					originalHeight	= 0;
 
-	// 加载位图-------------------------------------------------
+	// 1.加载叠加纹理WIC对象，读取像素数据
+
 	HRESULT hr = pIWICFactory->CreateDecoderFromFilename(
+		uriBlend,
+		NULL,
+		GENERIC_READ,
+		WICDecodeMetadataCacheOnLoad,
+		&pDecoder1
+		);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDecoder1->GetFrame(0, &pSource1);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pSource1->GetSize(&originalWidth,&originalHeight);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pIWICFactory->CreateBitmapFromSourceRect(
+			pSource1, 0,0,(UINT)originalWidth,(UINT)originalHeight, &pWIC);
+	}
+
+	UINT cbBufferSize1 = 0;
+	BYTE *pv1 = NULL;
+
+	if (SUCCEEDED(hr))
+	{
+		IWICBitmapLock *pILock1 = NULL;
+		WICRect rcLock1 = { 0, 0, originalWidth, originalHeight };
+		hr = pWIC->Lock(&rcLock1, WICBitmapLockWrite, &pILock1);
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pILock1->GetDataPointer(&cbBufferSize1, &pv1);
+			pILock1->Release();
+		}
+	}
+
+	// 2.加载主纹理WIC对象，读取像素数据
+
+	hr = pIWICFactory->CreateDecoderFromFilename(
 		uri,
 		NULL,
 		GENERIC_READ,
@@ -166,64 +207,38 @@ IWICBitmap* GetWICBitmapFromFile(
 
 	if (SUCCEEDED(hr))
 	{
-		UINT uiWidth = 0;
-		UINT uiHeight = 0;
-		pWIC->GetSize(&uiWidth, &uiHeight);
-
 		IWICBitmapLock *pILock = NULL;
-		WICRect rcLock = { 0, 0, uiWidth, uiHeight };
+		WICRect rcLock = { 0, 0, originalWidth, originalHeight };
 		hr = pWIC->Lock(&rcLock, WICBitmapLockWrite, &pILock);
 
 		if (SUCCEEDED(hr))
 		{
 			UINT cbBufferSize = 0;
-			UINT cbStride = 0;
 			BYTE *pv = NULL;
 
-			// Retrieve the stride.
-			hr = pILock->GetStride(&cbStride);
-			WICPixelFormatGUID format;
-			pILock->GetPixelFormat(&format);
 			if (SUCCEEDED(hr))
 			{
 				hr = pILock->GetDataPointer(&cbBufferSize, &pv);
 			}
 
-			// 伴随IWICBitmap对象返回，保存图像像素数据，
-			// 因为我们将重复利用IWICBitmap对象，所以要保存图片原始像素数据
-			if (SUCCEEDED(hr))
+			// 3.使用主像素数据和叠加像素数据行混合操作
+
+			for (unsigned int i=0; i<cbBufferSize; i+=4)
 			{
-				*srcData = new BYTE[cbBufferSize];
-				memcpy(*srcData, pv, cbBufferSize);
-				*srcSize = cbBufferSize;
+				if (pv[i+3] != 0)
+				{
+					pv[i]   = pv[i]*(1-proportion)   + pv1[i]*proportion;
+					pv[i+1] = pv[i+1]*(1-proportion) + pv1[i+1]*proportion;
+					pv[i+2] = pv[i+2]*(1-proportion) + pv1[i+2]*proportion;
+					pv[i+3] = pv[i+3]*(1-proportion) + pv1[i+3]*proportion;             
+				}
 			}
 
-			// Release the bitmap lock.
 			pILock->Release();
 		}
 	}
 
-	SafeRelease(&pDecoder);
-	SafeRelease(&pSource);
-
-	return pWIC;
-}
-
-ID2D1Bitmap* GetD2DBitmapFromWICBitmap(
-	IWICImagingFactory *pIWICFactory,
-	ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source, 
-	float d2dWidth, 
-	float d2dHeight,
-	BYTE* srcData,
-	UINT srcSize)
-{
-	IWICFormatConverter*	pConverter	= NULL;
-	IWICBitmapScaler*		pScaler		= NULL;
-	ID2D1Bitmap*			bitmap		= NULL;
-	HRESULT					hr			= S_FALSE;
-
-	Assert(source);	// source can't be null
+	// 4.使用计算后的主纹理WIC位图创建D2D位图
 
 	if (SUCCEEDED(hr))
 	{
@@ -235,7 +250,7 @@ ID2D1Bitmap* GetD2DBitmapFromWICBitmap(
 	}
 	if (SUCCEEDED(hr))
 	{
-		hr = pScaler->Initialize(source, (UINT)d2dWidth, (UINT)d2dHeight, WICBitmapInterpolationModeCubic);
+		hr = pScaler->Initialize(pWIC, (UINT)originalWidth, (UINT)originalHeight, WICBitmapInterpolationModeCubic);
 	}
 	if (SUCCEEDED(hr))
 	{
@@ -251,245 +266,21 @@ ID2D1Bitmap* GetD2DBitmapFromWICBitmap(
 
 	if (SUCCEEDED(hr))
 	{
-		// Create a Direct2D bitmap from the WIC bitmap.
 		hr = pRenderTarget->CreateBitmapFromWicBitmap(
 			pConverter,
 			NULL,
-			&bitmap
+			&pBitmap
 			);
 	}
 
 	SafeRelease(&pConverter);
 	SafeRelease(&pScaler);
+	SafeRelease(&pDecoder);
+	SafeRelease(&pSource);
+	SafeRelease(&pDecoder1);
+	SafeRelease(&pSource1);
 
-	if (SUCCEEDED(hr))
-	{
-		return bitmap;
-	}
-
-	return NULL;
-}
-
-ID2D1Bitmap* GetBitmapFromFile(
-	IWICImagingFactory *pIWICFactory, 
-	ID2D1RenderTarget *pRenderTarget,
-	LPCWSTR uri, 
-	UINT width, 
-	UINT height)
-{
-	BYTE*			srcData = NULL;
-	UINT			srcSize = 0;
-	IWICBitmap*		wicBitmap = NULL;
-	ID2D1Bitmap*	bitmap = NULL;
-
-	wicBitmap = GetWICBitmapFromFile(pIWICFactory, uri, &srcData, &srcSize);
-	delete[] srcData;
-	if (wicBitmap)
-	{
-		bitmap = GetD2DBitmapFromWICBitmap(pIWICFactory, pRenderTarget, wicBitmap, (float)width, (float)height, NULL, srcSize);
-	}
-
-	return bitmap;
-}
-
-ID2D1Bitmap* GetBlendedBitmapWithColor(
-	IWICImagingFactory *pIWICFactory, 
-	ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source,
-	const D2D1_COLOR_F &color,
-	float d2dWidth,
-	float d2dHeight,
-	BYTE* srcData,
-	UINT srcSize)
-{
-	ID2D1Bitmap*	bitmap = NULL;
-
-	HRESULT hr = BlendWithColor(source, color, srcData, srcSize);
-	if (SUCCEEDED(hr))
-	{
-		bitmap = GetD2DBitmapFromWICBitmap(pIWICFactory, pRenderTarget, source, d2dWidth, d2dHeight, srcData, srcSize);
-	}
-
-	return bitmap;
-}
-
-HRESULT BlendWithColor(
-	IWICBitmap* source, 
-	const D2D1_COLOR_F &color,
-	BYTE* srcData,
-	UINT srcSize)
-{
-	Assert(source);	// source can't be null
-
-	UINT uiWidth = 0;
-	UINT uiHeight = 0;
-	source->GetSize(&uiWidth, &uiHeight);
-
-	IWICBitmapLock *pILock = NULL;
-	WICRect rcLock = { 0, 0, uiWidth, uiHeight };
-	HRESULT hr = source->Lock(&rcLock, WICBitmapLockWrite, &pILock);
-
-	if (SUCCEEDED(hr))
-	{
-		UINT cbBufferSize = 0;
-		UINT cbStride = 0;
-		BYTE *pv = NULL;
-
-		// Retrieve the stride.
-		hr = pILock->GetStride(&cbStride);
-
-		if (SUCCEEDED(hr))
-		{
-			hr = pILock->GetDataPointer(&cbBufferSize, &pv);
-		}
-
-		// reset the texture
-		if (cbBufferSize==srcSize)
-		{
-			memcpy(pv, srcData, srcSize);
-		}
-
-		for (unsigned int i=0; i<cbBufferSize; i+=4)
-		{
-			if (pv[i+3] != 0)
-			{
-				pv[i]	*=color.b;
-				pv[i+1]	*=color.g;
-				pv[i+2]	*=color.r;
-				pv[i+3] *=color.a;
-			}
-		}
-
-		// Release the bitmap lock.
-		pILock->Release();
-	}
-
-	return hr;
-}
-
-HRESULT BlendWithBitmap(
-	IWICBitmap* source, 
-	BYTE* srcData,
-	UINT srcSize,
-	IWICBitmap* source1, 
-	BYTE* srcData1,
-	UINT srcSize1,
-	float proportion)
-{
-	Assert(source!=NULL && source1!=NULL);	// source can't be null
-
-	HRESULT hr = S_OK;
-
-	UINT uiWidth1 = 0;
-	UINT uiHeight1 = 0;
-	source1->GetSize(&uiWidth1, &uiHeight1);
-
-	IWICBitmapLock *pILock1 = NULL;
-	WICRect rcLock1 = { 0, 0, uiWidth1, uiHeight1 };
-	hr = source1->Lock(&rcLock1, WICBitmapLockWrite, &pILock1);
-
-	UINT cbBufferSize1 = 0;
-	UINT cbStride1 = 0;
-	BYTE *pv1 = NULL;
-
-	if (SUCCEEDED(hr))
-	{
-		// Retrieve the stride.
-		hr = pILock1->GetStride(&cbStride1);
-
-		if (SUCCEEDED(hr))
-		{
-			hr = pILock1->GetDataPointer(&cbBufferSize1, &pv1);
-		}
-
-		// reset the texture
-		if (cbBufferSize1==srcSize1)
-		{
-			memcpy(pv1, srcData1, srcSize1);
-		}
-
-// 		for (unsigned int i=0; i<cbBufferSize1; i+=4)
-// 		{
-// 			if (pv1[i+3] != 0)
-// 			{
-// 				pv1[i]	 *= pv1[i];
-// 				pv1[i+1] *= pv1[i+1];
-// 				pv1[i+2] *= pv1[i+2];
-// 				pv1[i+3] *= pv1[i+3];
-// 			}
-// 		}
-
-		pILock1->Release();
-	}
-
-
-	UINT uiWidth = 0;
-	UINT uiHeight = 0;
-	source->GetSize(&uiWidth, &uiHeight);
-
-	IWICBitmapLock *pILock = NULL;
-	WICRect rcLock = { 0, 0, uiWidth, uiHeight };
-	hr = source->Lock(&rcLock, WICBitmapLockWrite, &pILock);
-
-	if (SUCCEEDED(hr))
-	{
-		UINT cbBufferSize = 0;
-		UINT cbStride = 0;
-		BYTE *pv = NULL;
-
-		// Retrieve the stride.
-		hr = pILock->GetStride(&cbStride);
-
-		if (SUCCEEDED(hr))
-		{
-			hr = pILock->GetDataPointer(&cbBufferSize, &pv);
-		}
-
-		// reset the texture
-		if (cbBufferSize==srcSize)
-		{
-			memcpy(pv, srcData, srcSize);
-		}
-
-		for (unsigned int i=0; i<cbBufferSize; i+=4)
-		{
-			if (pv[i+3] != 0)
-			{
-				pv[i]	= pv[i]*(1-proportion)	 + pv1[i]*proportion;
-				pv[i+1]	= pv[i+1]*(1-proportion) + pv1[i+1]*proportion;
-				pv[i+2]	= pv[i+2]*(1-proportion) + pv1[i+2]*proportion;
-				pv[i+3] = pv[i+3]*(1-proportion) + pv1[i+3]*proportion;				
-			}
-		}
-
-		// Release the bitmap lock.
-		pILock->Release();
-	}
-
-	return hr;
-}
-
-ID2D1Bitmap* GetBlendedBitmapWithBitmap(
-	IWICImagingFactory *pIWICFactory, 
-	ID2D1RenderTarget *pRenderTarget,
-	IWICBitmap* source,
-	BYTE* srcData,
-	UINT srcSize,
-	IWICBitmap* source1,
-	BYTE* srcData1,
-	UINT srcSize1,
-	float d2dWidth,
-	float d2dHeight)
-{
-	ID2D1Bitmap*	bitmap = NULL;
-
-	HRESULT hr = BlendWithBitmap(source, srcData, srcSize, source1, srcData1, srcSize1, 0.7);
-	if (SUCCEEDED(hr))
-	{
-		bitmap = GetD2DBitmapFromWICBitmap(pIWICFactory, pRenderTarget, source, d2dWidth, d2dHeight, srcData, srcSize);
-	}
-
-	return bitmap;
+	return pBitmap;
 }
 
 /******************************************************************
@@ -662,21 +453,8 @@ HRESULT DemoApp::CreateDeviceResources()
 		// 创建位图，并进行颜色混合
 		if (SUCCEEDED(hr))
 		{
-			IWICBitmap*			pWIC = NULL;
-			BYTE*				srcData = NULL;
-			UINT				srcSize = 0;
-
-			IWICBitmap*			pWIC1 = NULL;
-			BYTE*				srcData1 = NULL;
-			UINT				srcSize1 = 0;
-
-			pWIC = GetWICBitmapFromFile(m_pWICFactory,L"bitmap.png", &srcData, &srcSize);
-			pWIC1 = GetWICBitmapFromFile(m_pWICFactory,L"bitmapBlend.png", &srcData1, &srcSize1);
-
-			UINT bitmapWidth, bitmapHeight;
-			pWIC->GetSize(&bitmapWidth, &bitmapHeight);
-			m_pBitmapBlended = GetBlendedBitmapWithBitmap(m_pWICFactory, m_pRT, 
-				pWIC, srcData, srcSize, pWIC1, srcData1, srcSize1, bitmapWidth, bitmapHeight);
+			m_pBitmapBlended = GetBitmapBlendWithBitmapFromFile(m_pWICFactory, m_pRT,
+				L"bitmap.png", L"bitmapBlend.png", 0.7);
 		}
     }
 
@@ -735,9 +513,9 @@ HRESULT DemoApp::OnRender()
 			m_pBitmapBlended,
 			D2D1::RectF(
 			0 + m_pBitmap->GetSize().width,
-			0,
+			m_pBitmap->GetSize().height/2,
 			m_pBitmap->GetSize().width + m_pBitmapBlended->GetSize().width,
-			0 + m_pBitmapBlended->GetSize().height));
+			m_pBitmap->GetSize().height/2 + m_pBitmapBlended->GetSize().height));
 		
         // 结束绘制
         hr = m_pRT->EndDraw();
