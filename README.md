@@ -1,5 +1,5 @@
 # Direct2DTests
-This repo contains the samples for my learning in Direct2D.
+This repo contains the samples for my learning in Direct2D. Most of the samples are explained in the blog http://www.cnblogs.com/Ray1024/.
 
 ## D2DBezierToWave
 This project is a test about rendering waveform using bezier in Direct2D.
