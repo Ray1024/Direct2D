@@ -3,11 +3,10 @@
 大部分示例代码在[我的博客](http://www.cnblogs.com/Ray1024/)中都有详细解释。
 
 ## D2DBezierToWave
-此项目展示了在Direct2D中如何使用贝塞尔曲线绘制波形图
+此项目展示了在Direct2D中如何使用贝塞尔曲线绘制波形图。
 
 ## D2DBitmapBlend
-此项目展示了如何对位图进行颜色混合
-Article Link : http://www.cnblogs.com/Ray1024/p/6189257.html
+此项目展示了如何对位图进行颜色混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。
 
 ## D2DBitmapBlendWithBitmap
 This project is test that shows how to blend bitmap with bitmap.</br>
