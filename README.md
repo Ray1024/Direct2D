@@ -9,45 +9,36 @@
 此项目展示了如何对位图进行颜色混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。
 
 ## D2DBitmapBlendWithBitmap
-This project is test that shows how to blend bitmap with bitmap.</br>
-Article Link : http://www.cnblogs.com/Ray1024/p/6189257.html
+此项目展示了将两个位图进行混合并显示的效果，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。
 
 ## D2DCollisionDetectionBetweenGeometrys
-This project is about collision detection between two geometrys.</br>
-Article Link : http://www.cnblogs.com/Ray1024/p/6030242.html
+此项目展示了两个几何图形对象之间的位置关系判断，即碰撞检测，详见[博客：Direct2D处理几何图形之间的碰撞检测（下）](http://www.cnblogs.com/Ray1024/p/6030242.html)。
 
 ## D2DCreateBitmapFromResource
-This project shows how to create bitmap from resource file in Direct2D.</br>
-Article Link : http://www.cnblogs.com/Ray1024/p/6104368.html
+此项目展示了如何从资源文件加载位图，详见[博客：Direct2d开发之从资源加载位图](http://www.cnblogs.com/Ray1024/p/6030242.html)。
 
 ## D2DFPS
-This project is a test about fps in Direct2D.
+此项目是关于帧数的一个测试程序。
 
 ## D2DFrameApp
-This project is a frame application of my tests in Direct2D.</br>
-It can display the fps , so you can use the project to develop games or animations.
+此项目是我整理的一个Direct2D的简单程序框架，可以自动计算帧数。
 
 ## D2DGeometricTranslationOrder
-This project shows that the different order of geometric translation lead to different result.</br>
-The right order is 'scale -> rotate -> translate'in the geometric translation.
+此项目展示了在Direct2D绘图中，几何变换的顺序是有固定顺序的，正确的顺序应该是：缩放 -> 旋转 -> 平移。如果你随意改变几何变换的顺序，将会导致不可预见的错误结果。
 
 ## D2DGeometryCollisionDetectionWithPt
-This project is about collision detection between point and geometry object.</br>
-Article Link : http://www.cnblogs.com/Ray1024/p/6028108.html
+此项目展示了几何图形对象和点的位置关系判断，即碰撞检测，详见[博客：Direct2D处理几何图形之间的碰撞检测（上）](http://www.cnblogs.com/Ray1024/p/6028108.html)。
 
 ## D2DMesh
-This project is about rendering mesh in Direct2D.</br>
-Article Link : http://www.cnblogs.com/Ray1024/p/6103981.html
+此项目展示了在Direct2D中如何绘制网格，详见[博客：Direct2d开发之绘制网格](http://www.cnblogs.com/Ray1024/p/6103981.html)。
 
 ## D2DTMPL
-This project is the template of my Direct2D codes.
+这个项目是本仓库中大部分示例程序都使用的一个空框架程序。
 
 ## DWriteCustomFont
-This project is a test about custom font in DirectWrite.</br>
-In this project, We can directly use custom font files instead of loading to project resource file.</br>
-And we don't have to use system font files to render text.</br>
-The method is using path geometry instead of text format. We create path geometry from custom font file and string. After that,we just render the path geometry.
+此项目展示了在DirectWrite中绘制自定义字体（即非系统字体）。</br>
+将自定义字体文件加载为资源文件也可以，但是在这里我是用的是另外一种方法。</br>
+方法是用字体文件和需要绘制的字符串创建路径几何图形（path geometry），然后直接绘制路径几何图形即可。
 
 ## DWriteStringTrimming
-This project is about string trimming in DirectWrite.</br>
-Article Link : http://www.cnblogs.com/Ray1024/p/5660490.html
+此项目展示了使用DirectWrite绘制文本时，对字符串进行去尾操作，详见[博客：Direct2D开发之字符串去尾](http://www.cnblogs.com/Ray1024/p/5660490.html)。
