@@ -1,11 +1,12 @@
 # Direct2DTests
-This repo contains the samples for my learning in Direct2D. Most of the samples are explained in the blog http://www.cnblogs.com/Ray1024/.
+这个仓库包含了我学习Direct2D过程中写的示例代码，会不定时更新。</br>
+大部分示例代码在[我的博客](http://www.cnblogs.com/Ray1024/)中都有详细解释。
 
 ## D2DBezierToWave
-This project is a test about rendering waveform using bezier in Direct2D.
+此项目展示了在Direct2D中如何使用贝塞尔曲线绘制波形图
 
 ## D2DBitmapBlend
-This project is test that shows how to blend bitmap with color.</br>
+此项目展示了如何对位图进行颜色混合
 Article Link : http://www.cnblogs.com/Ray1024/p/6189257.html
 
 ## D2DBitmapBlendWithBitmap
