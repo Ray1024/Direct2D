@@ -87,8 +87,8 @@ HRESULT DemoApp::Initialize()
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            static_cast<UINT>(ceil(512.f * dpiX / 96.f)),
-            static_cast<UINT>(ceil(512.f * dpiY / 96.f)),
+            static_cast<UINT>(ceil(480.f * dpiX / 96.f)),
+            static_cast<UINT>(ceil(320.f * dpiY / 96.f)),
             NULL,
             NULL,
             HINST_THISCOMPONENT,
@@ -157,12 +157,12 @@ HRESULT DemoApp::CreateDeviceResources()
 		if (SUCCEEDED(hr))
 		{
 			hr = m_pDWriteFactory->CreateTextFormat( 
-				L"Arial Black", 
+				L"Edwardian Script ITC",
 				NULL, 
-				DWRITE_FONT_WEIGHT_NORMAL, 
+				DWRITE_FONT_WEIGHT_BOLD, 
 				DWRITE_FONT_STYLE_NORMAL, 
 				DWRITE_FONT_STRETCH_NORMAL, 
-				20.0, 
+				60.0, 
 				L"en-us",
 				&m_pTextFormat);
 		}
@@ -200,14 +200,14 @@ HRESULT DemoApp::OnRender()
         m_pRT->BeginDraw();
 
         m_pRT->SetTransform(D2D1::Matrix3x2F::Identity());
-        m_pRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
+        m_pRT->Clear(D2D1::ColorF(D2D1::ColorF::LightBlue));
 
 		// ªÊ÷∆
         m_pRT->DrawText(
-			L"Ray1024_D2D_Template",
-			wcslen(L"Ray1024_D2D_Template"),
+			L"Template project of Direct2D.",
+			wcslen(L"Template project of Direct2D."),
 			m_pTextFormat,
-			D2D1::RectF(0,0,300,0),
+			D2D1::RectF(0,0,480,0),
 			m_pBrush);
 		
         // Ω· ¯ªÊ÷∆
