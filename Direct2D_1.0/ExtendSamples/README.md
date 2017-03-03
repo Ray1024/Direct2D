@@ -6,7 +6,7 @@
 QQ：253293026</br>
 博客：http://www.cnblogs.com/Ray1024/
 
-##[上一级](http://www.cnblogs.com/Ray1024/)
+##[上一级](https://github.com/Ray1024/Direct2D#direct2d-samples)
 
 ##进阶示例
 
