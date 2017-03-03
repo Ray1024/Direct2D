@@ -1,10 +1,6 @@
-# Direct2D-Samples
-这个仓库包含了我学习Direct2D过程中写的示例代码，会不定时地更新。</br>
-大部分示例代码在我的博客中都有详细解释，如果您有任何疑问，可以去我的博客看详细介绍，也可以通过QQ联系我。
-
-##联系方式
-QQ：253293026</br>
-博客：http://www.cnblogs.com/Ray1024/
+##Direct2D_1.0
+此目录为Direct2D_1.0版本的示例代码。</br>
+[上一级](https://github.com/Ray1024/Direct2D)
 
 ##仓库简介
 
