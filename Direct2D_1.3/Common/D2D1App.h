@@ -39,6 +39,8 @@ protected:
 	HRESULT CreateDeviceIndependentResources();
 	// 创建设备有关资源
 	HRESULT CreateDeviceResources();
+	// 每次窗口大小更改时，都需要重新创建这些资源
+	void CreateWindowSizeDependentResources();
 	// 丢弃设备有关资源
 	void DiscardDeviceResources();
 	// 计算帧数信息
@@ -49,6 +51,8 @@ protected:
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) { }
 	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
 	virtual void OnMouseWheel(UINT nFlags, short zDelta, int x, int y) { }
+	// 消息处理：重设尺寸
+	virtual void OnResize(UINT width, UINT height);
 	// 消息处理：窗口销毁
 	virtual void OnDestroy();
 
@@ -63,6 +67,11 @@ protected:
 	BOOL								m_fRunning = TRUE;
 	// 用于记录deltatime和游戏时间
 	D2D1Timer							m_timer;
+
+	// D3D 设备
+	ID3D11Device*						m_pD3DDevice;
+	// D3D 设备上下文
+	ID3D11DeviceContext*				m_pD3DDeviceContext;
 
 #ifdef USE_D2D1_3
 	// D2D 工厂

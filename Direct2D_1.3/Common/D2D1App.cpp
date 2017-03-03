@@ -96,16 +96,8 @@ HRESULT D2D1App::CreateDeviceIndependentResources()
 
 HRESULT D2D1App::CreateDeviceResources()
 {
-	// D3D 设备
-	ID3D11Device*						pD3DDevice = nullptr;
-	// D3D 设备上下文
-	ID3D11DeviceContext*				pD3DDeviceContext = nullptr;
-	// DXGI 适配器
-	IDXGIAdapter*						pDxgiAdapter = nullptr;
 	// DXGI 工厂
 	IDXGIFactory2*						pDxgiFactory = nullptr;
-	// DXGI Surface 后台缓冲
-	IDXGISurface*						pDxgiBackBuffer = nullptr;
 	// DXGI 设备
 	IDXGIDevice1*						pDxgiDevice = nullptr;
 
@@ -116,8 +108,7 @@ HRESULT D2D1App::CreateDeviceResources()
 	if (SUCCEEDED(hr))
 	{
 		// D3D11 创建flag 
-		// 一定要有D3D11_CREATE_DEVICE_BGRA_SUPPORT
-		// 否则创建D2D设备上下文会失败
+		// 一定要有D3D11_CREATE_DEVICE_BGRA_SUPPORT，否则创建D2D设备上下文会失败
 		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #ifdef _DEBUG
 		// Debug状态 有D3D DebugLayer就可以取消注释
@@ -139,67 +130,117 @@ HRESULT D2D1App::CreateDeviceResources()
 			nullptr,					// 强行指定WARP渲染 D3D_DRIVER_TYPE_WARP 没有软件接口
 			creationFlags,				// 创建flag
 			featureLevels,				// 欲使用的特性等级列表
-			lengthof(featureLevels),	// 特性等级列表长度
+			ARRAYSIZE(featureLevels),	// 特性等级列表长度
 			D3D11_SDK_VERSION,			// SDK 版本
-			&pD3DDevice,				// 返回的D3D11设备指针
+			&m_pD3DDevice,				// 返回的D3D11设备指针
 			&m_featureLevel,			// 返回的特性等级
-			&pD3DDeviceContext);		// 返回的D3D11设备上下文指针
+			&m_pD3DDeviceContext);		// 返回的D3D11设备上下文指针
 	}
 
 	// 创建 IDXGIDevice
 	if (SUCCEEDED(hr))
-		hr = pD3DDevice->QueryInterface(IID_PPV_ARGS(&pDxgiDevice));
+		hr = m_pD3DDevice->QueryInterface(IID_PPV_ARGS(&pDxgiDevice));
 	// 创建D2D设备
 	if (SUCCEEDED(hr))
 		hr = m_pD2DFactory->CreateDevice(pDxgiDevice, &m_pD2DDevice);
 	// 创建D2D设备上下文
 	if (SUCCEEDED(hr))
 		hr = m_pD2DDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_pD2DDeviceContext);
-	// 获取Dxgi适配器 可以获取该适配器信息
-	if (SUCCEEDED(hr))
+
+	SafeRelease(pDxgiDevice);
+	SafeRelease(pDxgiFactory);
+
+	CreateWindowSizeDependentResources();
+
+	return hr;
+}
+
+void D2D1App::CreateWindowSizeDependentResources()
+{
+	// DXGI 适配器
+	IDXGIAdapter*						pDxgiAdapter = nullptr;
+	// DXGI 工厂
+	IDXGIFactory2*						pDxgiFactory = nullptr;
+	// DXGI Surface 后台缓冲
+	IDXGISurface*						pDxgiBackBuffer = nullptr;
+	// DXGI 设备
+	IDXGIDevice1*						pDxgiDevice = nullptr;
+
+	HRESULT hr = S_OK;
+
+	// 清除之前窗口的呈现器相关设备
+	m_pD2DDeviceContext->SetTarget(nullptr);
+	SafeRelease(m_pD2DTargetBimtap);
+	m_pD3DDeviceContext->Flush();
+
+	RECT rect = { 0 }; GetClientRect(m_hWnd, &rect);
+
+	if (m_pSwapChain != nullptr)
 	{
-		// 顺带使用像素作为单位
-		m_pD2DDeviceContext->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
-		hr = pDxgiDevice->GetAdapter(&pDxgiAdapter);
+		// 如果交换链已经创建，则重设缓冲区
+		hr = m_pSwapChain->ResizeBuffers(
+			2, // Double-buffered swap chain.
+			lround(rect.right - rect.left),
+			lround(rect.bottom - rect.top),
+			DXGI_FORMAT_B8G8R8A8_UNORM,
+			0);
+
+		assert( hr == S_OK );
 	}
-	// 获取Dxgi工厂
-	if (SUCCEEDED(hr))
+	else
 	{
-		hr = pDxgiAdapter->GetParent(IID_PPV_ARGS(&pDxgiFactory));
-	}
-	// 创建交换链
-	if (SUCCEEDED(hr))
-	{
-		RECT rect = { 0 }; GetClientRect(m_hWnd, &rect);
-		// 交换链信息
+		// 否则用已存在的D3D设备创建一个新的交换链
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = { 0 };
-		swapChainDesc.Width = rect.right - rect.left;
-		swapChainDesc.Height = rect.bottom - rect.top;
+		swapChainDesc.Width = lround(rect.right - rect.left);
+		swapChainDesc.Height = lround(rect.bottom - rect.top);
 		swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		swapChainDesc.Stereo = FALSE;
+		swapChainDesc.Stereo = false;
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = 2;
-		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 		swapChainDesc.Flags = 0;
+		swapChainDesc.Scaling = DXGI_SCALING_NONE;
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
-		// 一般桌面应用程序
-		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-		// 利用窗口句柄创建交换链
-		hr = pDxgiFactory->CreateSwapChainForHwnd(
-			pD3DDevice,
-			m_hWnd,
-			&swapChainDesc,
-			nullptr,
-			nullptr,
-			&m_pSwapChain);
+		// 获取 IDXGIDevice
+		if (SUCCEEDED(hr))
+		{
+			hr = m_pD3DDevice->QueryInterface(IID_PPV_ARGS(&pDxgiDevice));
+		}
+		// 获取Dxgi适配器 可以获取该适配器信息
+		if (SUCCEEDED(hr))
+		{
+			hr = pDxgiDevice->GetAdapter(&pDxgiAdapter);
+		}
+		// 获取Dxgi工厂
+		if (SUCCEEDED(hr))
+		{
+			hr = pDxgiAdapter->GetParent(IID_PPV_ARGS(&pDxgiFactory));
+		}
+		// 创建交换链
+		if (SUCCEEDED(hr))
+		{
+			hr = pDxgiFactory->CreateSwapChainForHwnd(
+				m_pD3DDevice,
+				m_hWnd,
+				&swapChainDesc,
+				nullptr,
+				nullptr,
+				&m_pSwapChain);
+		}
+		// 确保DXGI队列里边不会超过一帧
+		if (SUCCEEDED(hr))
+		{
+			hr = pDxgiDevice->SetMaximumFrameLatency(1);
+		}
 	}
-	// 确保DXGI队列里边不会超过一帧
+
+	// 设置屏幕方向
 	if (SUCCEEDED(hr))
 	{
-		hr = pDxgiDevice->SetMaximumFrameLatency(1);
+		hr = m_pSwapChain->SetRotation(DXGI_MODE_ROTATION_IDENTITY);
 	}
 	// 利用交换链获取Dxgi表面
 	if (SUCCEEDED(hr))
@@ -224,18 +265,12 @@ HRESULT D2D1App::CreateDeviceResources()
 	{
 		// 设置 Direct2D 渲染目标
 		m_pD2DDeviceContext->SetTarget(m_pD2DTargetBimtap);
-		// 使用像素作为单位
-		m_pD2DDeviceContext->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
 	}
 
-	SafeRelease(pD3DDevice);
-	SafeRelease(pD3DDeviceContext);
 	SafeRelease(pDxgiDevice);
 	SafeRelease(pDxgiAdapter);
 	SafeRelease(pDxgiFactory);
 	SafeRelease(pDxgiBackBuffer);
-
-	return hr;
 }
 
 // 丢弃设备相关资源
@@ -245,6 +280,8 @@ void D2D1App::DiscardDeviceResources()
 	SafeRelease(m_pSwapChain);
 	SafeRelease(m_pD2DDeviceContext);
 	SafeRelease(m_pD2DDevice);
+	SafeRelease(m_pD3DDevice);
+	SafeRelease(m_pD3DDeviceContext);
 }
 
 
@@ -300,6 +337,11 @@ void D2D1App::Run()
     }
 }
 
+void D2D1App::OnResize(UINT width, UINT height)
+{
+	CreateWindowSizeDependentResources();
+}
+
 void D2D1App::OnDestroy()
 {
     m_fRunning = FALSE;
@@ -340,6 +382,10 @@ LRESULT D2D1App::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case WM_MBUTTONDOWN:
 			case WM_RBUTTONDOWN:
 				pD2DApp->OnMouseDown(wParam, LOWORD(lParam), HIWORD(lParam));
+				break;
+
+			case WM_SIZE:
+				pD2DApp->OnResize(LOWORD(lParam), HIWORD(lParam));
 				break;
 
 			case WM_LBUTTONUP:
