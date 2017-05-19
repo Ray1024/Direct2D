@@ -1,5 +1,6 @@
 # Direct2D-Samples
 这个仓库包含了我学习Direct2D过程中写的示例代码，所有版本(1.0至1.3)的代码示例都在这里，并不定时地更新。</br>
+同样也包含了DirectWrite和WIC等常用工具的示例。</br>
 大部分示例代码在我的博客中都有详细解释，如果您有任何疑问，可以去我的博客看详细介绍，也可以通过QQ联系我。
 
 ## Direct2D版本和windows sdk版本对应关系
@@ -13,4 +14,5 @@
 
 ## 联系方式
 QQ：253293026</br>
+email：guojianlei010@163.com</br>
 博客：http://www.cnblogs.com/Ray1024/
