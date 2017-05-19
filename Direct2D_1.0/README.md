@@ -18,6 +18,7 @@
 | D2DCreateBitmapFromResource|从资源文件加载位图，详见[博客：Direct2d开发之从资源加载位图](http://www.cnblogs.com/Ray1024/p/6104368.html)。|
 | D2DGeometricTranslationOrder|在Direct2D绘图中，几何变换的顺序是有固定顺序的，正确的顺序应该是：缩放 -> 旋转 -> 平移。如果你随意改变几何变换的顺序，将会导致不可预见的错误结果。|
 | D2DMesh|绘制网格，详见[博客：Direct2d开发之绘制网格](http://www.cnblogs.com/Ray1024/p/6103981.html)。|
+| DWriteCharacterSymbol | 演示了DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。|
 | DWriteCustomFont|使用DirectWrite绘制自定义字体（即非系统字体）。</br>将自定义字体文件加载为资源文件也可以，但是在这里我是用的是另外一种方法。</br>方法是用字体文件和需要绘制的字符串创建路径几何图形（path geometry），然后直接绘制路径几何图形即可。|
 | DWriteStringTrimming|使用DirectWrite绘制文本时，对字符串进行去尾操作，详见[博客：Direct2D开发之字符串去尾](http://www.cnblogs.com/Ray1024/p/5660490.html)。|
 | D2DLayeredWnd| Direct2D绘制分层窗口。|
