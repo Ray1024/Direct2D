@@ -10,9 +10,9 @@
 | Direct2D_1.0 | win7   | d2d1.h   | d2d1.lib | d2d1.dll |[示例](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.0) |
 | Direct2D_1.1 | win8   | d2d1_1.h | d2d1.lib | d2d1.dll |[示例](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.1) |
 | Direct2D_1.2 | win8.1 | d2d1_2.h | d2d1.lib | d2d1.dll |[示例](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.2) |
-| Direct2D_1.3 | win10  | d2d1_3.h | d2d1.lib | d2d1.dll |[示例](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.3) |
+| Direct2D_1.3 | win10sdk版本 10.0.10586  | d2d1_3.h | d2d1.lib | d2d1.dll |[示例](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.3) |
 
 ## 联系方式
-QQ：253293026</br>
+qq：253293026</br>
 email：guojianlei010@163.com</br>
-博客：http://www.cnblogs.com/Ray1024/
+blog：http://www.cnblogs.com/Ray1024/
