@@ -7,8 +7,6 @@
 #ifndef RAY1024_COMMON
 #define RAY1024_COMMON
 
-#define  _WIN32_WINNT   0x0A01
-
 #include <Windows.h>
 
 #include <cstdint>

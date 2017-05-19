@@ -7,5 +7,4 @@
 |项目名称|项目介绍|
 | ----|----|
 | D2D1Template| 本仓库中大部分示例程序都使用的一个空框架程序。|
-| D2D1EffectGaussianBlur| Direct2D 1.1中的内置特效之高斯模糊。|
 | D2D1Sprite| Direct2D 1.3中的批精灵（ID2D1SpriteBatch）示例。|
