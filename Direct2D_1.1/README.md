@@ -9,3 +9,4 @@
 | D2D1Template| 本仓库中大部分示例程序都使用的一个空框架程序。|
 | D2D1BitmapFlip| 打破二维的限制，实现图片的翻转 |
 | D2D1EffectGaussianBlur| Direct2D 1.1中的内置特效之高斯模糊。|
+| D2D1EffectDiscreteTransfer| Direct2D 1.1中的内置特效之离散传递效果。|
