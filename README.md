@@ -3,6 +3,9 @@
 同样也包含了DirectWrite和WIC等常用工具的示例。</br>
 大部分示例代码在我的博客中都有详细解释，如果您有任何疑问，可以去我的博客看详细介绍，也可以通过QQ联系我。
 
+## 示例编写使用的IDE
+Direct2D_1.0中使用的IDE为vs2010，其余均为vs2015。
+
 ## Direct2D版本和windows sdk版本对应关系
 
 | Direct2D版本 | windows sdk版本 | 头文件 | Library | DLL | 示例地址 |
