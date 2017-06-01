@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\D2D1App.cpp" />
+    <ClCompile Include="..\Common\D2D1Func.cpp" />
     <ClCompile Include="D2D1Sprite.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -14,13 +14,13 @@
     <ClInclude Include="..\Common\D2D1App.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\D2D1Func.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\D2D1Timer.h">
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\D2D1Func.h">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -30,6 +30,9 @@
     </ClCompile>
     <ClCompile Include="D2D1Sprite.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\D2D1Func.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

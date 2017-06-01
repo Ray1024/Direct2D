@@ -73,21 +73,12 @@ protected:
 	// D3D 设备上下文
 	ID3D11DeviceContext*				m_pD3DDeviceContext;
 
-#ifdef USE_D2D1_3
 	// D2D 工厂
 	ID2D1Factory4*                      m_pD2DFactory = nullptr;
 	// D2D 设备
 	ID2D1Device3*                       m_pD2DDevice = nullptr;
 	// D2D 设备上下文
 	ID2D1DeviceContext3*                m_pD2DDeviceContext = nullptr;
-#else
-	// D2D 工厂
-	ID2D1Factory3*                      m_pD2DFactory = nullptr;
-	// D2D 设备
-	ID2D1Device2*                       m_pD2DDevice = nullptr;
-	// D2D 设备上下文
-	ID2D1DeviceContext2*                m_pD2DDeviceContext = nullptr;
-#endif // USE_D2D1_3
 
 	// WIC 工厂
 	IWICImagingFactory2*                m_pWICFactory = nullptr;

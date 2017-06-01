@@ -1,12 +1,9 @@
 ﻿/***********************************************************************
-程序：Direct2D 1.3 批精灵示例
+程序：Direct2D 1.3 批精灵示例（示例比较了批精灵和位图两种绘制方式的效率差别）
 功能：实例化D2D1App子类，利用现成的程序框架，并在子类中实现自己的功能
 作者：Ray1024
 网址：http://www.cnblogs.com/Ray1024/
 ***********************************************************************/
-
-// 如果使用Direct2D1.3的API，需要定义下面这个宏
-#define USE_D2D1_3
 
 #include "../Common/D2D1App.h"
 #include "../Common/D2D1Func.h"
@@ -146,11 +143,6 @@ HRESULT D2D1Template::Initialize(HINSTANCE hInstance, int nCmdShow)
 	{
 		hr = m_pD2DDeviceContext->CreateSpriteBatch(&m_pSpriteBatch);
 	}
-	// 创建精灵
-	if (SUCCEEDED(hr))
-	{
-		hr = CreateSprites(g_mapData, m_pSpriteBatch);
-	}
 	// 载入地图资源集
 	if (SUCCEEDED(hr))
 	{
@@ -172,13 +164,13 @@ void D2D1Template::DrawScene()
 
 		D2D1_MATRIX_3X2_F matrix;
 		m_pD2DDeviceContext->GetTransform(&matrix);
-// 		const float zoom = 0.5;
-// 		m_pD2DDeviceContext->SetTransform(D2D1::Matrix3x2F::Scale(D2D1::SizeF(zoom, zoom)));
 		m_pD2DDeviceContext->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 
 		// 渲染方式：批精灵
 		if (m_bState)
 		{
+			CreateSprites(g_mapData, m_pSpriteBatch);
+
 			m_pD2DDeviceContext->DrawSpriteBatch(
 				m_pSpriteBatch, m_pMapAsset, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 		}
