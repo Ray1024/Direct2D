@@ -126,16 +126,24 @@ void D2D1EffectGaussianBlur::DrawScene()
 		float bitmapW = m_pBitmap->GetSize().width;
 		float bitmapH = m_pBitmap->GetSize().height;
 
-		m_pD2DDeviceContext->SetTransform(
-			D2D1::Matrix3x2F::Translation(1080/2, 640/2 - bitmapH/2));
+		m_pD2DDeviceContext->SetTransform(D2D1::Matrix3x2F::Translation(500, 300));
 
+		// 4*4的矩阵
 		D2D1::Matrix4x4F m;
-		m = m * D2D1::Matrix4x4F::RotationY(s_angle);
+
+		// 平移，决定旋转轴的位置
+		m = m * D2D1::Matrix4x4F::Translation(-bitmapW / 2, -bitmapH / 2, 0);
+		// 向量 vector {x, y, z}为翻转轴，可以指定为任意轴（注意：向量只是轴的方向，并没有指定轴的位置，向量+平移才能确定轴的方向和位置）
+		m = m * D2D1::Matrix4x4F::RotationX(s_angle);
+		m = m * D2D1::Matrix4x4F::RotationY(0);
+		m = m * D2D1::Matrix4x4F::RotationZ(0);
+		//m = m * D2D1::Matrix4x4F::RotationArbitraryAxis(0, 1, 0, s_angle);
+		// 深度
 		m = m * D2D1::Matrix4x4F::PerspectiveProjection(bitmapH*10);
 
 		m_pD2DDeviceContext->DrawBitmap(
 			m_pBitmap,
-			&D2D1::RectF(0 - bitmapW / 2, 0, bitmapW - bitmapW / 2, bitmapH),
+			&D2D1::RectF(0, 0, bitmapW, bitmapH),
 			1,
 			D2D1_INTERPOLATION_MODE_LINEAR,
 			&D2D1::RectF(0, 0, bitmapW, bitmapH),
