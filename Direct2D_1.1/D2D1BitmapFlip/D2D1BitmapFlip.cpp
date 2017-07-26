@@ -126,12 +126,10 @@ void D2D1EffectGaussianBlur::DrawScene()
 		float bitmapW = m_pBitmap->GetSize().width;
 		float bitmapH = m_pBitmap->GetSize().height;
 
-		m_pD2DDeviceContext->SetTransform(D2D1::Matrix3x2F::Translation(500, 300));
-
 		// 4*4的矩阵
 		D2D1::Matrix4x4F m;
 
-		// 平移，决定旋转轴的位置
+		// 将图片平移使得轴处在图片中心
 		m = m * D2D1::Matrix4x4F::Translation(-bitmapW / 2, -bitmapH / 2, 0);
 		// 向量 vector {x, y, z}为翻转轴，可以指定为任意轴（注意：向量只是轴的方向，并没有指定轴的位置，向量+平移才能确定轴的方向和位置）
 		m = m * D2D1::Matrix4x4F::RotationX(s_angle);
@@ -140,6 +138,9 @@ void D2D1EffectGaussianBlur::DrawScene()
 		//m = m * D2D1::Matrix4x4F::RotationArbitraryAxis(0, 1, 0, s_angle);
 		// 深度
 		m = m * D2D1::Matrix4x4F::PerspectiveProjection(bitmapH*10);
+
+		// 做完变换后，将图片平移回原处
+		m = m * D2D1::Matrix4x4F::Translation(bitmapW / 2, bitmapH / 2, 0);
 
 		m_pD2DDeviceContext->DrawBitmap(
 			m_pBitmap,
