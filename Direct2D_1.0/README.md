@@ -6,9 +6,7 @@
 
 |项目名称|项目介绍|
 | ----|----|
-| D2DTMPL|本仓库中大部分示例程序都使用的一个空框架程序。|
-| D2DFPS|关于帧数的一个测试程序。|
-| D2DFrameApp|我整理的一个Direct2D的简单程序框架，可以自动计算帧数。|
+| D2DTMPL|Direct2D的一个模板框架程序|
 | D2DBezierToWave|使用贝塞尔曲线绘制波形图。|
 | D2DBitmapBlend|对位图进行颜色混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。|
 | D2DBitmapBlendWithBitmap|将两个位图进行混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。|
