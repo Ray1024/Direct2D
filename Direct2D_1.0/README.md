@@ -20,3 +20,8 @@
 | DWriteCustomFont|使用DirectWrite绘制自定义字体（即非系统字体）。</br>将自定义字体文件加载为资源文件也可以，但是在这里我是用的是另外一种方法。</br>方法是用字体文件和需要绘制的字符串创建路径几何图形（path geometry），然后直接绘制路径几何图形即可。|
 | DWriteStringTrimming|使用DirectWrite绘制文本时，对字符串进行去尾操作，详见[博客：Direct2D开发之字符串去尾](http://www.cnblogs.com/Ray1024/p/5660490.html)。|
 | D2DLayeredWnd| Direct2D绘制分层窗口。|
+
+### 剪裁(D2DClip)
+#### 使用轴对称的矩形进行剪裁
+#### 使用几何图形蒙版进行剪裁
+![示例](http://git.oschina.net/Ray1024/PictureBed/blob/master/Direct2D/D2DClip.gif)
