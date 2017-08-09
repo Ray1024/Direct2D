@@ -17,7 +17,8 @@
 ### 1.3 纹理混合
 (1)对位图进行颜色混合(D2DBitmapBlend)</br>
 对位图进行颜色混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。</br>
-![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/Direct2DBlend1.png)
+![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/Direct2DBlend1.png)</br>
+
 (2)将两个位图进行混合(D2DBitmapBlendWithBitmap)</br>
 将两个位图进行混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。</br>
 ![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/Direct2DBlend2.png)
@@ -31,6 +32,9 @@
 
 ### 1.6 特殊字符符号(DWriteCharacterSymbol)
 DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。
+
+### 1.7 测量文字大小
+详见[博客：使用DirectWrite测量Direct2D文字大小](http://www.cnblogs.com/Ray1024/p/6027052.html)
 
 
 ## 二、扩展示例
