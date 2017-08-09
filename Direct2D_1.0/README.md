@@ -2,36 +2,38 @@
 此目录为Direct2D_1.0版本的示例代码。</br>
 [上一级](https://github.com/Ray1024/Direct2D)
 
-## 基础示例
+## 一、基础示例
 
-### 加载位图
+### 1.1 加载位图
 (1)从文件加载位图(D2DCreateBitmapFromFile)</br>
 (2)从资源加载位图(D2DCreateBitmapFromResource)</br>
 详见[博客：Direct2d开发之从资源加载位图](http://www.cnblogs.com/Ray1024/p/6104368.html)。
 
-### 剪裁(D2DClip)
+### 1.2 剪裁(D2DClip)
 (1)轴对称矩形剪裁</br>
 (2)几何图形蒙版剪裁
 ![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/D2DClip.gif)
 
-### 纹理混合
+### 1.3 纹理混合
 (1)对位图进行颜色混合(D2DBitmapBlend)</br>
 对位图进行颜色混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。
-
+![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/Direct2DBlend1.png)
 (2)将两个位图进行混合(D2DBitmapBlendWithBitmap)</br>
 将两个位图进行混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。
+![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/Direct2DBlend2.png)
 
-### 自定义字体(DWriteCustomFont)
+### 1.4 自定义字体(DWriteCustomFont)
 使用DirectWrite绘制自定义字体（即非系统字体）。</br>将自定义字体文件加载为资源文件也可以，但是在这里我是用的是另外一种方法。</br>方法是用字体文件和需要绘制的字符串创建路径几何图形（path geometry），然后直接绘制路径几何图形即可。
 
-### 字符串文本去尾(DWriteStringTrimming)
+### 1.5 字符串文本去尾(DWriteStringTrimming)
 使用DirectWrite绘制文本时，对字符串进行去尾操作，详见[博客：Direct2D开发之字符串去尾](http://www.cnblogs.com/Ray1024/p/5660490.html)。
+![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/DirectWriteStringTrimming.png)
 
-### 特殊字符符号(DWriteCharacterSymbol)
+### 1.6 特殊字符符号(DWriteCharacterSymbol)
 DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。
 
 
-## 扩展示例
+## 二、扩展示例
 
 |项目名称|项目介绍|
 | ----|----|
