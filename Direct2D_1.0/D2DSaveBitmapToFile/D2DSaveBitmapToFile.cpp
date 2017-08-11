@@ -272,6 +272,10 @@ HRESULT DemoApp::CreateDeviceResources()
             );
 
         // 创建render target
+		// 注意！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+		// 这里必须用D2D1_RENDER_TARGET_TYPE_SOFTWARE，
+		// 否则CompatibleRT的bitmap绘制在WICbitmap创建的RT上时会报错
+		//（错误信息：hr	0x88990015 在错误的呈现器目标上实现资源。HRESULT）
         hr = m_pD2DFactory->CreateHwndRenderTarget(
             D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_SOFTWARE),
             D2D1::HwndRenderTargetProperties(m_hwnd, size),
