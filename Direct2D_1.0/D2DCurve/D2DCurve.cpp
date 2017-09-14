@@ -147,15 +147,15 @@ void createCurve(std::vector<CvPoint> &originPoint, std::vector<CvPoint> &curveP
 	// 删除结束点到开始点之间的点集，让曲线不闭合
 
 	CvPoint pt = originPoint.back();
-	std::vector <CvPoint>::iterator itor = curvePoint.begin() + 1;
-	while(itor != curvePoint.end())	
+	std::vector <CvPoint>::iterator itor = curvePoint.end() - 1;
+	while(itor != curvePoint.begin())	
 	{
 		if (((*itor).x == pt.x && (*itor).y == pt.y))
 		{
 			break;
 		}
 
-		itor++;
+		itor--;
 	}
 
 	int itor_index = 0;
