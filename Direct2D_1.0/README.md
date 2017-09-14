@@ -45,6 +45,8 @@ DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。
 ### 1.8 测量文字大小
 详见[博客：使用DirectWrite测量Direct2D文字大小](http://www.cnblogs.com/Ray1024/p/6027052.html)
 
+### 1.9 使用平滑的曲线连接指定的几个点
+
 
 ## 二、扩展示例
 
