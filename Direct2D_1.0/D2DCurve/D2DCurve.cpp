@@ -38,6 +38,17 @@ struct CvPoint
 {
 	CvPoint(float _x = 0, float _y = 0) : x(_x), y(_y) {}
 
+	bool operator==(const CvPoint& right) const
+	{
+		return this->x == right.x && this->y == right.y;
+	}
+
+	bool operator<(const CvPoint& right) const
+	{
+		//return this->x < right.x;
+		return (x < right.x || (x == right.x && y < right.y));
+	}
+
 	float x;
 	float y;
 };
@@ -165,6 +176,11 @@ void createCurve(std::vector<CvPoint> &originPoint, std::vector<CvPoint> &curveP
 		curvePoint.erase(itor); 
 		itor = curvePoint.begin() + itor_index; 
 	}
+
+	// 删除附近重复的点
+	std::sort(curvePoint.begin(), curvePoint.end());
+
+	curvePoint.erase(unique(curvePoint.begin(), curvePoint.end()), curvePoint.end());  
 }
 
 /******************************************************************
@@ -224,8 +240,8 @@ HRESULT DemoApp::Initialize()
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            static_cast<UINT>(ceil(640.f * dpiX / 96.f)),
-            static_cast<UINT>(ceil(480.f * dpiY / 96.f)),
+            static_cast<UINT>(ceil(960.f * dpiX / 96.f)),
+            static_cast<UINT>(ceil(640+50.f * dpiY / 96.f)),
             NULL,
             NULL,
             HINST_THISCOMPONENT,
@@ -348,9 +364,8 @@ HRESULT DemoApp::OnRender()
 
 		for (int i=0; i<10; i++)
 		{
-			g_originPoint.push_back(CvPoint(Random(100, 540), Random(100, 480-100-50)));
+			g_originPoint.push_back(CvPoint(Random(100, 860), Random(100, 640-100)));
 		}
-
 		createCurve(g_originPoint, g_curvePoint);
 
         // 开始绘制
@@ -362,7 +377,7 @@ HRESULT DemoApp::OnRender()
 		m_pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::LawnGreen));
 		for(int i=0; i<g_curvePoint.size(); i++)
 		{
-			m_pRT->DrawRectangle(D2D1::RectF(g_curvePoint[i].x, g_curvePoint[i].y, g_curvePoint[i].x, g_curvePoint[i].y),m_pBrush, 1);
+			m_pRT->DrawRectangle(D2D1::RectF(g_curvePoint[i].x, g_curvePoint[i].y, g_curvePoint[i].x, g_curvePoint[i].y),m_pBrush, 2);
 		}
 
 		m_pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Red));
