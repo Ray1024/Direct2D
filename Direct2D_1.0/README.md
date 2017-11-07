@@ -47,9 +47,9 @@ DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。
 
 ### 1.9 使用平滑的曲线连接指定的几个点
 
-### 1.10 色度键过滤（绿幕抠图）
+### 1.10 [色度键过滤（绿幕抠图）](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.0/D2DChromaKey)
 绘制图片时，过滤掉指定颜色。（此方法直接操作像素，效率较低）</br>
-
+![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/D2DChromaKey.png)
 
 ## 二、扩展示例
 
