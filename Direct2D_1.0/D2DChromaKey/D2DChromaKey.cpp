@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------
-// 功能：从文件加载D2D位图，更多详细解释请参考：http://www.cnblogs.com/Ray1024/
+// 功能：色度键过滤示例，更多详细解释请参考：http://www.cnblogs.com/Ray1024/
 // 作者：Ray1024
 // 网址：http://www.cnblogs.com/Ray1024/
 //-----------------------------------------------------------------
@@ -343,8 +343,8 @@ HRESULT DemoApp::Initialize()
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            static_cast<UINT>(ceil(800.f * dpiX / 96.f)),
-            static_cast<UINT>(ceil(600.f * dpiY / 96.f)),
+            static_cast<UINT>(ceil(860.f * dpiX / 96.f)),
+            static_cast<UINT>(ceil(260.f * dpiY / 96.f)),
             NULL,
             NULL,
             HINST_THISCOMPONENT,
@@ -463,7 +463,7 @@ HRESULT DemoApp::OnRender()
         m_pRT->SetTransform(D2D1::Matrix3x2F::Identity());
         m_pRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		// 绘制
+		// 绘制正常图片
 		if (m_pBitmap)
 		{
 			m_pRT->DrawBitmap(
@@ -477,27 +477,29 @@ HRESULT DemoApp::OnRender()
 		{
 			m_pRT->DrawBitmap(
 				m_pBitmap1,
-				D2D1::RectF(0,250,
-				m_pBitmap->GetSize().width,
-				250+m_pBitmap->GetSize().height));
+				D2D1::RectF(250,0,
+				250+m_pBitmap->GetSize().width,
+				m_pBitmap->GetSize().height));
 		}
 		
+		// 绘制两张色度键过滤后的图片
+
 		if (m_pBitmapChromaKey1)
 		{
 			m_pRT->DrawBitmap(
 				m_pBitmapChromaKey1,
-				D2D1::RectF(400,100,
-				400+m_pBitmapChromaKey1->GetSize().width,
-				100+m_pBitmapChromaKey1->GetSize().height));
+				D2D1::RectF(600,0,
+				600+m_pBitmapChromaKey1->GetSize().width,
+				m_pBitmapChromaKey1->GetSize().height));
 		}
 
 		if (m_pBitmapChromaKey2)
 		{
 			m_pRT->DrawBitmap(
 				m_pBitmapChromaKey2,
-				D2D1::RectF(400,100,
-				400+m_pBitmapChromaKey2->GetSize().width,
-				100+m_pBitmapChromaKey2->GetSize().height));
+				D2D1::RectF(600,0,
+				600+m_pBitmapChromaKey2->GetSize().width,
+				m_pBitmapChromaKey2->GetSize().height));
 		}
 
         // 结束绘制

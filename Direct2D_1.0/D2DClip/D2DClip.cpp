@@ -209,8 +209,8 @@ HRESULT DemoApp::Initialize()
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            static_cast<UINT>(ceil(720.f * dpiX / 96.f)),
-            static_cast<UINT>(ceil(480.f * dpiY / 96.f)),
+            static_cast<UINT>(ceil(860.f * dpiX / 96.f)),
+            static_cast<UINT>(ceil(260.f * dpiY / 96.f)),
             NULL,
             NULL,
             HINST_THISCOMPONENT,
@@ -301,11 +301,11 @@ HRESULT DemoApp::CreateDeviceResources()
 		if (SUCCEEDED(hr))
 		{
 			pSink->SetFillMode(D2D1_FILL_MODE_WINDING);
-			pSink->BeginFigure(D2D1::Point2F(20+ 300, 50 + 100), D2D1_FIGURE_BEGIN_FILLED);
-			pSink->AddLine(D2D1::Point2F(130+ 300, 50 + 100));
-			pSink->AddLine(D2D1::Point2F(20+ 300, 130 + 100));
-			pSink->AddLine(D2D1::Point2F(80+ 300, 0 + 100));
-			pSink->AddLine(D2D1::Point2F(130+ 300, 130 + 100));
+			pSink->BeginFigure(D2D1::Point2F(20+ 300 + 200, 50 + 40), D2D1_FIGURE_BEGIN_FILLED);
+			pSink->AddLine(D2D1::Point2F(130+ 300 + 200, 50 + 40));
+			pSink->AddLine(D2D1::Point2F(20+ 300 + 200, 130 + 40));
+			pSink->AddLine(D2D1::Point2F(80+ 300 + 200, 0 + 40));
+			pSink->AddLine(D2D1::Point2F(130+ 300 + 200, 130 + 40));
 			pSink->EndFigure(D2D1_FIGURE_END_CLOSED);
 
 			hr = pSink->Close();
@@ -374,13 +374,13 @@ HRESULT DemoApp::OnRender()
         // 开始绘制
         m_pRT->BeginDraw();
 
-        m_pRT->Clear();
+        m_pRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
 		//////////////////////////////////////////////////////////////////////////
 		// 使用轴对称的矩形进行剪裁
 		//////////////////////////////////////////////////////////////////////////
 
-		m_pRT->PushAxisAlignedClip(	D2D1::RectF(50, 100, 250, 200), D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+		m_pRT->PushAxisAlignedClip(	D2D1::RectF(100, 50, 300, 150), D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 		m_pRT->SetTransform(D2D1::Matrix3x2F::Rotation(g_rotation, D2D1::Point2F(m_pBitmap->GetSize().width/2, m_pBitmap->GetSize().height/2)));
 
@@ -398,7 +398,7 @@ HRESULT DemoApp::OnRender()
 			L"矩形剪裁",
 			wcslen(L"矩形剪裁"),
 			m_pTextFormat,
-			D2D1::RectF(50,250,250,300),
+			D2D1::RectF(150,160,300,200),
 			m_pBrush);
 
 		//////////////////////////////////////////////////////////////////////////
@@ -416,7 +416,9 @@ HRESULT DemoApp::OnRender()
 				pLayer
 				);
 
-			m_pRT->SetTransform(D2D1::Matrix3x2F::Rotation(g_rotation, D2D1::Point2F(m_pBitmap->GetSize().width/2, m_pBitmap->GetSize().height/2)));
+			m_pRT->SetTransform(D2D1::Matrix3x2F::Rotation(g_rotation, D2D1::Point2F(m_pBitmap->GetSize().width/2, m_pBitmap->GetSize().height/2))
+				*D2D1::Matrix3x2F::Translation(300, 0)
+				);
 
 			m_pRT->DrawBitmap(
 				m_pBitmap,
@@ -435,7 +437,7 @@ HRESULT DemoApp::OnRender()
 			L"几何图形蒙版剪裁",
 			wcslen(L"几何图形蒙版剪裁"),
 			m_pTextFormat,
-			D2D1::RectF(300,250,500,300),
+			D2D1::RectF(500,160,700,200),
 			m_pBrush);
 
         // 结束绘制
