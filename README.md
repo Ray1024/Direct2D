@@ -17,5 +17,5 @@ Direct2D_1.0中使用的IDE为vs2010，其余均为vs2015。
 
 ## 联系方式
 qq：253293026</br>
-email：guojianlei010@163.com</br>
+email：ray__1024@163.com</br>
 blog：http://www.cnblogs.com/Ray1024/
