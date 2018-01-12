@@ -62,3 +62,11 @@ DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。
 | D2DGeometricTranslationOrder|在Direct2D绘图中，几何变换的顺序是有固定顺序的，正确的顺序应该是：缩放 -> 旋转 -> 平移。如果你随意改变几何变换的顺序，将会导致不可预见的错误结果。|
 | D2DMesh|绘制网格，详见[博客：Direct2d开发之绘制网格](http://www.cnblogs.com/Ray1024/p/6103981.html)。|
 | D2DLayeredWnd| Direct2D绘制分层窗口。|
+
+## 三、进阶示例
+[ExtendSamples](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.0/ExtendSamples)目录中的示例为进阶示例。
+
+|项目名称|项目介绍|
+| ----|----|
+| D2DMatrixPro | 此工程演示了Direct2D矩阵的高级使用方法，并说明了子节点和父节点的矩阵复合使用方法。 |
+| MFCD2DApplication | MFC工程中使用Direct2D。 |
