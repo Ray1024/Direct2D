@@ -6,7 +6,7 @@
 
 ### 1.1 绘制多种风格的线条
 使用ID2D1StrokeStyle类型的对象可以创建不同风格的线条，绘制出多种多样的几何图形。
-![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/D2DStrokeStyle.png)
+![示例](https://github.com/Ray1024/Direct2D/blob/master/images/D2DStrokeStyle.png)
 
 ### 1.2 加载位图
 (1)从文件加载位图(D2DCreateBitmapFromFile)</br>
@@ -25,23 +25,23 @@
 ### 1.4 剪裁(D2DClip)
 (1)轴对称矩形剪裁</br>
 (2)几何图形蒙版剪裁</br>
-![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/D2DClip.gif)
+![示例](https://github.com/Ray1024/Direct2D/blob/master/images/D2DClip.gif)
 
 ### 1.5 纹理混合
 (1)对位图进行颜色混合(D2DBitmapBlend)</br>
 对位图进行颜色混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。</br>
-![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/Direct2DBlend1.png)</br>
+![示例](https://github.com/Ray1024/Direct2D/blob/master/images/Direct2DBlend1.png)</br>
 
 (2)将两个位图进行混合(D2DBitmapBlendWithBitmap)</br>
 将两个位图进行混合，详见[博客：Direct2D开发之纹理混合](http://www.cnblogs.com/Ray1024/p/6189257.html)。</br>
-![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/Direct2DBlend2.png)
+![示例](https://github.com/Ray1024/Direct2D/blob/master/images/Direct2DBlend2.png)
 
 ### 1.6 自定义字体(DWriteCustomFont)
 使用DirectWrite绘制自定义字体（即非系统字体）。</br>将自定义字体文件加载为资源文件也可以，但是在这里我是用的是另外一种方法。</br>方法是用字体文件和需要绘制的字符串创建路径几何图形（path geometry），然后直接绘制路径几何图形即可。
 
 ### 1.7 字符串文本去尾(DWriteStringTrimming)
 使用DirectWrite绘制文本时，对字符串进行去尾操作，详见[博客：Direct2D开发之字符串去尾](http://www.cnblogs.com/Ray1024/p/5660490.html)。</br>
-![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/DirectWriteStringTrimming.png)
+![示例](https://github.com/Ray1024/Direct2D/blob/master/images/DirectWriteStringTrimming.png)
 
 ### 1.8 特殊字符符号(DWriteCharacterSymbol)
 DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。
@@ -53,7 +53,10 @@ DirectWrite使用"Segoe UI Symbol"字体来绘制一些字符符号。
 
 ### 1.11 [色度键过滤（绿幕抠图）](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.0/D2DChromaKey)
 绘制图片时，过滤掉指定颜色。（此方法直接操作像素，效率较低）</br>
-![示例](https://github.com/Ray1024/PictureBed/blob/master/Direct2D/D2DChromaKey.png)
+![示例](https://github.com/Ray1024/Direct2D/blob/master/images/D2DChromaKey.png)
+
+### 1.12 几何图形对象的组合
+![示例](https://github.com/Ray1024/Direct2D/blob/master/images/D2DCombineGeometries.png)
 
 ## 二、扩展示例
 
