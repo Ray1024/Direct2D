@@ -15,7 +15,3 @@ Direct2D_1.0中使用的IDE为vs2010，其余均为vs2015。
 | Direct2D_1.2 | win8.1 | d2d1_2.h | d2d1.lib | d2d1.dll |[示例](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.2) |
 | Direct2D_1.3 | win10sdk版本 10.0.10586  | d2d1_3.h | d2d1.lib | d2d1.dll |[示例](https://github.com/Ray1024/Direct2D/tree/master/Direct2D_1.3) |
 
-## 联系方式
-qq：253293026</br>
-email：ray__1024@163.com</br>
-blog：http://www.cnblogs.com/Ray1024/
